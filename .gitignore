@@ -1,0 +1,26 @@
+# 1. استبعاد المجلدات التشغيلية والمكتبات المثبتة لكل الطبقات
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# 2. استبعاد ملفات الإعدادات السرية والحساسة (الأمان أولاً)
+.env
+backend/.env
+frontend/.env
+*.env.local
+
+# 3. استبعاد قاعدة بيانات SQLite المحلية لمنع رفع بيانات الاختبار وتضارب البيانات
+*.sqlite
+*.sqlite3
+backend/database.sqlite
+
+# 4. استبعاد ملفات بناء المشروع النهائية للفرونت أند (سيتكفل سيرفر الرفع ببنائها)
+frontend/dist/
+frontend/build/
+
+# 5. استبعاد ملفات النظام المؤقتة
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.agents/
