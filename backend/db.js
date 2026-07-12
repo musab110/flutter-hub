@@ -1,12 +1,21 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize({ dialect: 'sqlite', storage: './database.sqlite', logging: false });
+const path = require('path'); // 💡 استيراد مكتبة إدارة المسارات المدمجة
+
+// 💡 تعديل مسار الحفظ ليكون مطلقاً وموجهاً لمجلد backend دائماً من خلال __dirname
+const sequelize = new Sequelize({ 
+    dialect: 'sqlite', 
+    storage: path.join(__dirname, 'database.sqlite'), 
+    logging: false 
+});
 
 // 1. جدول المستخدمين
 const User = sequelize.define('User', {
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     username: { type: DataTypes.STRING, allowNull: false },
     email: { type: DataTypes.STRING, allowNull: false, unique: true },
-    passwordHash: { type: DataTypes.STRING, allowNull: false }
+    // تم جعله allowNull: true ليدعم مصادقة جوجل
+    passwordHash: { type: DataTypes.STRING, allowNull: true },
+    googleId: { type: DataTypes.STRING, allowNull: true, unique: true }
 });
 
 // 2. جدول المحادثات
@@ -15,7 +24,6 @@ const Conversation = sequelize.define('Conversation', {
     title: { type: DataTypes.STRING, defaultValue: 'New Chat' },
     selectedModel: { type: DataTypes.STRING, defaultValue: 'qwen' }
 }, {
-    // 💡 تطبيق الفهارس (Indexes) لسرعة جلب القائمة الجانبية
     indexes: [{ fields: ['userId'] }]
 });
 
@@ -24,16 +32,12 @@ const Message = sequelize.define('Message', {
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     role: { type: DataTypes.ENUM('user', 'assistant', 'system'), allowNull: false },
     content: { type: DataTypes.TEXT, allowNull: false },
-    thinkingContent: { type: DataTypes.TEXT, allowNull: true } // لحفظ أفكار نماذج DeepSeek
+    thinkingContent: { type: DataTypes.TEXT, allowNull: true }
 }, {
-    // 💡 تطبيق الفهارس لسرعة جلب تاريخ الدردشة وتجميعها
     indexes: [{ fields: ['conversationId'] }]
 });
 
-// ===============================================
-// 🛠️ التهيئة الهندسية للعلاقات والحذف الآمن (Cascade)
-// ===============================================
-
+// العلاقات والحذف التلقائي
 User.hasMany(Conversation, { foreignKey: 'userId', onDelete: 'CASCADE' });
 Conversation.belongsTo(User, { foreignKey: 'userId' });
 

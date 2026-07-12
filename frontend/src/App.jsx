@@ -62,6 +62,42 @@ export default function App() {
   const chatEndRef = useRef(null);
   const textareaRef = useRef(null);
 
+  // 💡 تأثير حركي لجلب سكريبت جوجل الرسمي للـ Client ديناميكياً
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
+
+  // 💡 تأثير حركي لبناء وتوليد زر جوجل الرسمي داخل المودال عند فتحه
+  useEffect(() => {
+    if (showAuth && window.google) {
+      /* تفعيل المعرف والـ Callback */
+      window.google.accounts.id.initialize({
+        client_id: "1068580495439-4f8pf38fsbbthpmqeosoi70jg4grurol.apps.googleusercontent.com",
+        callback: handleGoogleCredentialResponse,
+      });
+
+      /* توليد الزر التفاعلي الأنيق في العنصر المخصص له */
+      window.google.accounts.id.renderButton(
+        document.getElementById("google-signin-btn"),
+        { 
+          theme: "outline", 
+          size: "large", 
+          width: "100%", 
+          text: authMode === 'login' ? 'signin_with' : 'signup_with',
+          shape: "pill"
+        }
+      );
+    }
+  }, [showAuth, authMode]);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('username');
@@ -213,6 +249,24 @@ export default function App() {
     }
   };
 
+  // 💡 دالة معالجة واستقبال التوكن من جوجل وإرساله للباكيند
+  const handleGoogleCredentialResponse = async (response) => {
+    setAuthError("");
+    try {
+      const res = await axios.post(`${API_URL}/auth/google`, {
+        credential: response.credential
+      });
+      
+      // حفظ الجلسة تماماً كما تفعل دالة الدخول العادية
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('username', res.data.user.username);
+      setUser({ token: res.data.token, username: res.data.user.username });
+      setShowAuth(false);
+      fetchHistoryTitles(res.data.token);
+    } catch (err) {
+       setAuthError(err.response?.data?.error || "فشل تسجيل الدخول عبر حساب جوجل، جرب الدخول العادي.");
+    }
+  };
   return (
     <div className="dashboard-container">
       <div className="liquid-canvas"></div>
@@ -690,35 +744,54 @@ export default function App() {
 
       {/* --- شاشة الدخول والتسجيل --- */}
       <AnimatePresence>
-        {showAuth && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} style={{position:'fixed', inset:0, background:'rgba(5, 0, 10, 0.4)', backdropFilter:'blur(20px)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center'}}>
-             <motion.div initial={{scale:0.9, y:30}} animate={{scale:1, y:0}} style={{background:'rgba(255, 255, 255, 0.95)', padding:'40px', width:'100%', maxWidth:'420px', borderRadius:'24px', border:'1px solid rgba(0,0,0,0.06)', boxShadow:'0 25px 50px rgba(0,0,0,0.1)'}}>
-                <h2 style={{margin:'0 0 10px', textAlign:'center', fontSize:'1.8rem', fontWeight:900, color:'var(--text-primary)'}}>
-                  <ShieldCheck size={28} color="var(--primary-purple)" style={{verticalAlign:'middle', marginLeft:'10px'}}/>  
-                  {authMode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}
-                </h2>
-                <p style={{textAlign:'center', color:'var(--text-secondary)', marginBottom:'25px'}}>
-                  {authMode === 'login' ? 'قم بتسجيل الدخول للمتابعة.' : 'ابدأ رحلة التعلم معنا اليوم.'}
-                </p>
-                <form onSubmit={submitAuth} style={{display:'flex', flexDirection:'column', gap:'15px'}}>
-                   {authMode === 'register' && (
-                      <input style={{background:'#ffffff', color:'var(--text-primary)', padding:'15px', borderRadius:'12px', border:'1px solid rgba(0,0,0,0.06)', outline:'none'}} type="text" placeholder="اسم المستخدم" value={authForm.username} onChange={e => setAuthForm({...authForm, username: e.target.value})} required/>
-                   )}
-                   <input style={{background:'#ffffff', color:'var(--text-primary)', padding:'15px', borderRadius:'12px', border:'1px solid rgba(0,0,0,0.06)', outline:'none'}} type="email" placeholder="البريد الإلكتروني" value={authForm.email} onChange={e => setAuthForm({...authForm, email: e.target.value})} required />
-                   <input style={{background:'#ffffff', color:'var(--text-primary)', padding:'15px', borderRadius:'12px', border:'1px solid rgba(0,0,0,0.06)', outline:'none'}} type="password" placeholder="كلمة المرور" value={authForm.password} onChange={e => setAuthForm({...authForm, password: e.target.value})} required />
-                   {authError && <div style={{color:'#ff4d4d', fontSize:'0.9rem', textAlign:'center'}}>{authError}</div>}
-                   <button type="submit" className="new-chat-btn" style={{padding:'15px', marginTop:'15px', fontSize:'1.1rem'}}>{authMode==='login'?'تسجيل الدخول':'إنشاء حساب'}</button>
-                </form>
-                <div style={{marginTop:'25px', textAlign:'center', color:'var(--text-secondary)', fontSize:'0.9rem', cursor:'pointer'}} onClick={()=>setAuthMode(authMode==='login'?'register':'login')}>
-                   {authMode==='login'?' ليس لديك حساب؟ إنشاء حساب':'لديك حساب بالفعل؟ تسجيل الدخول! '}
-                </div>
-                <div style={{textAlign:'center', marginTop:'20px'}}>
-                   <button onClick={()=>setShowAuth(false)} style={{background:'none', border:'none', color:'#666', cursor:'pointer', borderBottom:'1px solid #666', fontWeight:'bold'}}> إغلاق</button>
-                </div>
-             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  {showAuth && (
+    <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} style={{position:'fixed', inset:0, background:'rgba(5, 0, 10, 0.4)', backdropFilter:'blur(20px)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center'}}>
+       <motion.div initial={{scale:0.9, y:30}} animate={{scale:1, y:0}} style={{background:'rgba(255, 255, 255, 0.95)', padding:'40px', width:'100%', maxWidth:'420px', borderRadius:'24px', border:'1px solid rgba(0,0,0,0.06)', boxShadow:'0 25px 50px rgba(0,0,0,0.1)'}}>
+          
+          <h2 style={{margin:'0 0 10px', textAlign:'center', fontSize:'1.8rem', fontWeight:900, color:'var(--text-primary)'}}>
+            <ShieldCheck size={28} color="var(--primary-purple)" style={{verticalAlign:'middle', marginLeft:'10px'}}/>  
+            {authMode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}
+          </h2>
+          
+          <p style={{textAlign:'center', color:'var(--text-secondary)', marginBottom:'25px'}}>
+            {authMode === 'login' ? 'قم بتسجيل الدخول للمتابعة.' : 'ابدأ رحلة التعلم معنا اليوم.'}
+          </p>
+          
+          {/* تم إصلاح خطأ فتح وإغلاق الفورم هنا */}
+          <form onSubmit={submitAuth} style={{display:'flex', flexDirection:'column', gap:'15px'}}>
+             {authMode === 'register' && (
+                <input style={{background:'#ffffff', color:'var(--text-primary)', padding:'15px', borderRadius:'12px', border:'1px solid rgba(0,0,0,0.06)', outline:'none'}} type="text" placeholder="اسم المستخدم" value={authForm.username} onChange={e => setAuthForm({...authForm, username: e.target.value})} required/>
+             )}
+             <input style={{background:'#ffffff', color:'var(--text-primary)', padding:'15px', borderRadius:'12px', border:'1px solid rgba(0,0,0,0.06)', outline:'none'}} type="email" placeholder="البريد الإلكتروني" value={authForm.email} onChange={e => setAuthForm({...authForm, email: e.target.value})} required />
+             <input style={{background:'#ffffff', color:'var(--text-primary)', padding:'15px', borderRadius:'12px', border:'1px solid rgba(0,0,0,0.06)', outline:'none'}} type="password" placeholder="كلمة المرور" value={authForm.password} onChange={e => setAuthForm({...authForm, password: e.target.value})} required />
+             
+             {authError && <div style={{color:'#ff4d4d', fontSize:'0.9rem', textAlign:'center'}}>{authError}</div>}
+             
+             {/* تم حذف الزر المكرر وترك زر واحد فقط */}
+             <button type="submit" className="new-chat-btn" style={{padding:'15px', marginTop:'15px', fontSize:'1.1rem'}}>{authMode==='login'?'تسجيل الدخول':'إنشاء حساب'}</button>
+          </form>
+
+          {/* الفاصل البصري لزر جوجل */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '20px 0' }}>
+             <div style={{ flex: 1, height: '1px', background: 'rgba(0,0,0,0.06)' }}></div>
+             <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>أو المتابعة باستخدام</span>
+             <div style={{ flex: 1, height: '1px', background: 'rgba(0,0,0,0.06)' }}></div>
+          </div>
+
+          {/* حاوية زر جوجل الذكي */}
+          <div id="google-signin-btn" style={{ width: '100%', minHeight: '44px' }}></div>
+          
+          <div style={{marginTop:'25px', textAlign:'center', color:'var(--text-secondary)', fontSize:'0.9rem', cursor:'pointer'}} onClick={()=>setAuthMode(authMode==='login'?'register':'login')}>
+             {authMode==='login'?' ليس لديك حساب؟ إنشاء حساب':'لديك حساب بالفعل؟ تسجيل الدخول! '}
+          </div>
+          
+          <div style={{textAlign:'center', marginTop:'20px'}}>
+             <button onClick={()=>setShowAuth(false)} style={{background:'none', border:'none', color:'#666', cursor:'pointer', borderBottom:'1px solid #666', fontWeight:'bold'}}> إغلاق</button>
+          </div>
+       </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
 
     </div>
   );
