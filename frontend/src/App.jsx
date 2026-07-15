@@ -15,7 +15,8 @@ import {
 
 import './index.css';
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://flutter-hub-backend.onrender.com/api"; 
+
 
 // 💻 مكوّن عرض الكود ثيم الماك بوك الفاخر الموحد
 const CodeBlock = ({ children, language }) => {

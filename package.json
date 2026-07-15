@@ -5,7 +5,9 @@
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "dev:server": "nodemon backend/backend/server.js",
+    "dev:client": "npm run dev --prefix frontend",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"bgBlue.bold,bgMagenta.bold\" --kill-others \"npm run dev:server\" \"npm run dev:client\""
   },
   "dependencies": {
     "@huggingface/inference": "^4.13.14",
@@ -25,6 +27,7 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "nodemon": "^3.1.0"
   }
 }
