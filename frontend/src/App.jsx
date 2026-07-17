@@ -52,7 +52,8 @@ export default function App() {
   
   const [activeTab, setActiveTab] = useState("playground");
   const [aiModel, setAiModel] = useState("qwen"); 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // 💡 جعل السايد بار يفتح افتراضياً على الكمبيوتر ويغلق افتراضياً على الجوال تلقائياً
+const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState("login");
@@ -512,7 +513,7 @@ export default function App() {
                   <div className="logo-icon-sphere" style={{width: '50px', height: '50px', margin: '0 0 20px auto'}}><Cpu size={26} color="white" /></div>
                   <h2 style={{fontSize: '2rem', fontWeight: 900, marginBottom: '15px'}}>حول منصة Flutter Mastery Hub</h2>
                   <p style={{color: 'var(--text-secondary)', lineHeight: 1.8, fontSize: '1.05rem', marginBottom: '20px'}}>
-                    مرحباً بك في المنصة البرمجية المخصصة لتعليم واحتراف وتطوير تطبيقات الهواتف الذكية باستخدام إطار عمل <strong>Flutter</strong> ولغة البرمجة <strong>Dart</strong>. تم تصميم هذه المنصة وتهيئتها برمجياً بواسطة مجموعة من خبراء ومطوري Flutter العالميين لتكون دليلك المتكامل في سوق العمل.
+                    مرحباً بك في المنصة البرمجية المخصصة لتعليم واحتراف وتطوير تطبيقات الهواتف الذكية باستخدام إطار عمل <strong>Flutter</strong> ولغة البرمجة <strong>Dart</strong>. تم تصميم هذه المنصة وتهيئتها برمجياً بواسطةم/ مصعب الجعشني  لتكون دليلك المتكامل في سوق العمل.
                   </p>
                   <p style={{color: 'var(--text-secondary)', lineHeight: 1.8, fontSize: '1.05rem', marginBottom: '20px'}}>
                     تسعى المنصة لتسريع بيئة تطوير وبناء الحلول البرمجية الفعالة، لتزود المطورين والمهندسين بأفضل الممارسات الهندسية المعترف بها دولياً في صياغة الأكواد وهيكلتها، بعيداً عن التعقيد.

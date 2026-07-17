@@ -616,3 +616,85 @@ summary {
   background: var(--primary-purple); 
   color: white; 
 }
+/* ================================================= */
+/* 📱 9. التجاوب الكامل مع الهواتف والأجهزة اللوحية (Responsive System) */
+/* ================================================= */
+@media (max-width: 768px) {
+  /* تمديد لوحة العمل لتأخذ كامل الشاشة دون هوامش جمالية مخصصة للكمبيوتر */
+  .app-layout {
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* تحويل السايد بار إلى طبقة عائمة فوق الشاشة تفتح لليسار بنعومة */
+  .sidebar-pro {
+    position: fixed;
+    top: 0;
+    right: 0; /* التوجيه لليمين لأن الواجهة عربية RTL */
+    height: 100%;
+    width: 280px;
+    background: rgba(248, 250, 252, 0.98) !important; /* خلفية معتمة بالكامل لحجب النصوص خلفها */
+    border-left: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  /* إخفاء السايد بار بسحبه لليمين خارج حدود الجوال عند إغلاقه */
+  .sidebar-pro.closed {
+    width: 280px;
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* تحسين وضبط هوامش الشات الداخلية على الجوال لتوفير أكبر مساحة للكود */
+  .content-canvas {
+    padding: 20px 15px !important;
+  }
+
+  /* تكييف شريط الإدخال ومكان الكتابة */
+  .dock-container {
+    padding: 10px 15px 15px !important;
+  }
+  .glass-input-bar {
+    padding: 8px 15px !important;
+    border-radius: 14px !important;
+  }
+
+  /* تبسيط الفوتر وتقليصه عمودياً للجوال */
+  .premium-footer {
+    flex-direction: column;
+    gap: 12px;
+    padding: 15px 20px !important;
+    text-align: center;
+  }
+  .footer-links-wrapper {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* تكييف كروت التمرير الترحيبية لتناسب عرض الموبايل */
+  .welcome-card-item {
+    flex: 0 0 220px; /* كروت أصغر قليلاً لمسح الشاشة */
+    padding: 16px;
+  }
+
+  /* ضبط هوامش وتصميم الناف بار في الجوال */
+  .header-minimal {
+    padding: 0 15px !important;
+    height: 60px;
+  }
+  .social-zone {
+    gap: 10px;
+  }
+
+  /* تقليص حجم ترويسة الترحيب لتفادي تكسر السطور */
+  h1, h2 {
+    font-size: 1.5rem !important;
+  }
+}
