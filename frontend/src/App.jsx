@@ -269,20 +269,41 @@ const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
        setAuthError(err.response?.data?.error || "فشل تسجيل الدخول عبر حساب جوجل، جرب الدخول العادي.");
     }
   };
-  return (
+ return (
     <div className="dashboard-container">
       <div className="liquid-canvas"></div>
 
       {/* ================================== */}
       {/* 🚀 1. السايد بار الفاتح المعزول (Sidebar) */}
       {/* ================================== */}
+      
+      {/* 👇 تم وضع كود الغطاء الزجاجي هنا تماماً فوق الـ <aside> مباشرة 👇 */}
+      {isSidebarOpen && (
+        <div 
+          className="sidebar-overlay"
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+      )}
+      
       <aside className={`sidebar-pro ${!isSidebarOpen ? 'closed' : ''}`}>
         
-        <div className="sidebar-header" onClick={startNewChat} style={{cursor: 'pointer'}}>
-          <div className="logo-icon-sphere">
-             <Cpu size={18} color="white" />
+       {/* ترويسة السايد بار المحدثة لتدعم زر إغلاق ذكي خاص بالجوال */}
+        <div className="sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div onClick={startNewChat} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className="logo-icon-sphere">
+               <Cpu size={18} color="white" />
+            </div>
+            <span>FLUTTER<span style={{color:'var(--primary-purple)'}}>HUB</span></span>
           </div>
-          FLUTTER<span style={{color:'var(--primary-purple)'}}>HUB</span>
+          
+          {/* زر إغلاق السايد بار الذكي في الجوال */}
+          <button 
+            onClick={() => setIsSidebarOpen(false)} 
+            className="mobile-close-sidebar-btn"
+            title="إغلاق القائمة"
+          >
+            <PanelRightClose size={18} />
+          </button>
         </div>
         
         <div className="sidebar-menu">

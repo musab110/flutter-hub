@@ -697,4 +697,47 @@ summary {
   h1, h2 {
     font-size: 1.5rem !important;
   }
+  /* الافتراضي للكمبيوتر: نخفي الغطاء وزر الإغلاق الداخلي */
+.sidebar-overlay {
+  display: none;
+}
+.mobile-close-sidebar-btn {
+  display: none !important;
+}
+
+/* ================================================= */
+/* 📱 تجميعة التجاوب للموبايل (مدمجة مسبقاً وتضاف هذه التنسيقات داخلها) */
+/* ================================================= */
+@media (max-width: 768px) {
+  
+  /* 💡 تفعيل الغطاء الخلفي الزجاجي لإغلاق السايد بار بالنقر الخارجي */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1000; /* أعلى من المحتوى وخلف السايد بار مباشرة */
+  }
+
+  /* 💡 تفعيل زر الإغلاق الداخلي في ترويسة السايد بار على الجوال */
+  .mobile-close-sidebar-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .mobile-close-sidebar-btn:hover {
+    color: var(--text-primary);
+    background: rgba(0, 0, 0, 0.06);
+  }
+}
 }
